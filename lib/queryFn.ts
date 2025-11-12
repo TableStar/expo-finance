@@ -1,5 +1,5 @@
-import axios from "axios";
-import {OPENWEATHER_KEY} from "@env"
+import axios from 'axios';
+import { OPENWEATHER_KEY } from '@env';
 
 export const fetchWeatherByCity = async (place: string) => {
   try {
@@ -16,5 +16,17 @@ export const fetchWeatherByCity = async (place: string) => {
     // }
   } catch (error) {
     console.log(error);
+  }
+};
+
+export const fetchCitySuggestions = async (query: string) => {
+  if (!query) return [];
+  try {
+    const {data} = await axios.get(
+      `https://api.openweathermap.org/data/2.5/find?q=${query}&appid=${OPENWEATHER_KEY}`
+    );
+    return data.list.map((item: any) => item.name);
+  } catch (e) {
+    console.log(e);
   }
 };
