@@ -3,65 +3,67 @@
 This document provides guidelines for AI agents working on this codebase.
 
 ## Developer Context
+- Beginner in React Native/Expo, completed Expo tutorial app.
+- Experienced in React, especially React Router v7 framework mode.
 
-- The developer is a beginner in React Native and Expo, though they have completed the Expo tutorial app.
-- They are experienced in React, especially with React Router v7 framework mode.
+## Project Structure
+- `app/`: Expo Router pages using file-based routing.
+- `components/`: Reusable UI components (including `nativewindui/` library).
+- `lib/`: Utilities (`cn` for className merging, `queryFn` for API calls, `useColorScheme`).
+- `store/`: Zustand state management stores.
+- `theme/`: NativeWind theme configuration and colors.
+- `types/`: TypeScript type definitions.
 
-## Build, Lint, and Test Commands
-
-- **Lint:** `pnpm lint`
-- **Format:** `pnpm format`
+## Package Manager & Commands
+- **Package Manager:** `pnpm`
+- **Lint:** `pnpm lint` (ESLint with `eslint-config-expo` + Prettier check)
+- **Format:** `pnpm format` (ESLint fix + Prettier write)
 - **Build:** `pnpm build:dev`, `pnpm build:preview`, `pnpm build:prod`
-- **Start:** `pnpm start`
-- **Test:** There is no dedicated test command.
+- **Start:** `pnpm start` (Expo dev client)
+- **Test:** No dedicated test command or test suite exists.
 
 ## Code Style Guidelines
 
-### Formatting
-
-- **Print Width:** 100 characters
-- **Tab Width:** 2 spaces
-- **Quotes:** Single quotes
-- **Trailing Comma:** es5
-- **Bracket Spacing:** `bracketSameLine: true`
-- Run `pnpm format` to apply formatting.
-
-### Linting
-
-- This project uses ESLint with `eslint-config-expo`.
-- Run `pnpm lint` to check for linting errors.
+### Formatting & Linting
+- **Print Width:** 100 chars, **Tab Width:** 2 spaces, **Quotes:** Single quotes
+- **Trailing Comma:** `es5`, **Bracket Spacing:** `bracketSameLine: true`
+- Use `pnpm format` to apply formatting, `pnpm lint` to check errors.
+- ESLint config: `eslint-config-expo` with custom rules in `eslint.config.js`.
 
 ### Naming Conventions
+- **Components:** `PascalCase` (e.g., `SearchInput`)
+- **Functions/Variables:** `camelCase` (e.g., `fetchCitySuggestions`)
+- **Constants:** `UPPER_SNAKE_CASE` (e.g., `API_KEY`)
+- **Hooks:** `use` prefix (e.g., `useDebounce`)
 
-- **Components:** `PascalCase` (e.g., `MyComponent`)
-- **Functions/Variables:** `camelCase` (e.g., `myFunction`)
-- **Constants:** `UPPER_SNAKE_CASE` (e.g., `MY_CONSTANT`)
-- **Hooks:** `use` prefix (e.g., `useMyHook`)
+### Imports & Path Aliases
+- Group imports: external libraries first, then internal.
+- Use `@/` path alias (maps to root) for internal imports: `import { cn } from '@/lib/cn';`
+- Import React as: `import * as React from 'react';`
 
-### Imports
-
-- Group imports by source (external, internal).
-- Use the `@/` path alias for internal imports (e.g., `import { MyComponent } from '@/components/MyComponent';`).
-- Import React as `import * as React from 'react';`.
-
-### Types
-
-- This project uses TypeScript with strict mode enabled.
-- Define types using `type` aliases.
-- All function component props should be typed.
+### TypeScript
+- Strict mode enabled (`tsconfig.json`).
+- Use `type` aliases over `interface` where possible.
+- All component props must be typed explicitly.
 
 ### State Management
+- Use Zustand stores defined in `store/` directory.
+- Define store interfaces in corresponding type files.
 
-- Use Zustand for global state management.
-- Define store interfaces with TypeScript.
-
-### Styling
-
-- Use NativeWind (Tailwind CSS for React Native).
+### Styling & UI
+- Use NativeWind (Tailwind CSS for React Native) with `className` props.
+- Use `cn()` utility (`lib/cn.ts`) for conditional className merging.
 - Use `class-variance-authority` (cva) for component variants.
-- Use `Platform.select` for platform-specific code/styles.
+- Platform-specific styles: `Platform.select({ ios: ..., android: ... })`
 
 ### Error Handling
+- Use `try...catch` for operations that may fail (API calls, async operations).
+- Display user-facing errors with `Alert.alert`.
 
-- Use `try...catch` blocks for operations that may fail.
-- Use `Alert.alert` to display error messages to the user.
+## Key Tools & Libraries
+- **NativeWind:** Tailwind CSS for React Native
+- **TanStack Query:** Data fetching and caching (`useQuery`, `queryFn`)
+- **Zustand:** Global state management
+- **class-variance-authority:** Component variant styling
+- **Expo Router:** File-based navigation
+- **React Native:** Core UI components
