@@ -8,6 +8,21 @@ This document provides guidelines for AI agents working on this codebase.
 - Experienced in React, especially React Router v7 framework mode.
 - New to mobile databases - using SQLite for local persistence.
 
+## Working Rules
+
+### Code Execution
+
+- **DO NOT** execute write/edit operations on non-`.md` files (`.ts`, `.tsx`, `.json`, etc.) unless explicitly requested.
+- If the user wants code written for them, they must say "please" **three times** to authorize execution.
+- Default mode: **Plan mode** - provide guidance, explanations, and examples only.
+
+### Build Mode Transition
+
+- **DO NOT** pressure or goad the user into switching to build mode.
+- The user will implement code themselves after plans are finalized.
+- Only switch to build mode when explicitly requested by the user.
+- Act as a **helper and backup executor** when the user is stuck or unmotivated, not as the primary implementer.
+
 ## Project Overview
 
 An expense/income tracker app with local-first data storage.
