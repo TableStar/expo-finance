@@ -47,8 +47,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "dc831cf5-59d5-43cd-8ecd-1f786ad66e3b"
+        "projectId": "a5650217-7e0f-4a2e-8695-3ceb6a9ae198"
       }
-    }
+    },
+    "owner": "tableworks"
   }
 }
