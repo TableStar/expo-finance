@@ -1,18 +1,23 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { useTransactions } from '@/store/store';
 import { TransactionsList } from '@/components/TransactionsList';
 import { FILTERS, FilterType } from '@/types/types';
 import { getDateRange } from '@/lib/date';
+import { router } from 'expo-router';
 
 export default function Home() {
   const insets = useSafeAreaInsets();
   const [activeFilter, setActiveFilter] = useState<FilterType>('All');
   const [periodeOffset, setPeriodeOffset] = useState(0);
   const { transactions, setFilters, previousBalance } = useTransactions();
-  const [currAccount, setCurrAccount] = useState('Account_Name');
+
+  const accounts = useTransactions((s) => s.accounts);
+  const activeAccountId = useTransactions((s) => s.activeAccountId);
+
+  const currAccount = accounts.find((acc) => acc.id === activeAccountId);
 
   useEffect(() => {
     if (activeFilter === 'All') {
@@ -58,8 +63,11 @@ export default function Home() {
           <TouchableOpacity>
             <Ionicons name="menu" size={28} color="white" />
           </TouchableOpacity>
-          <TouchableOpacity className="flex-row items-center">
-            <Text className="text-xl font-bold text-white">{currAccount}</Text>
+          <TouchableOpacity
+            className="flex-row items-center"
+            onPress={() => router.push('/accounts-modal')}>
+            <MaterialCommunityIcons name={currAccount?.icon ?? 'wallet'} size={20} color="white" />
+            <Text className="text-xl font-bold text-white">{currAccount?.name ?? '  '}</Text>
             <MaterialIcons name="arrow-drop-down" size={24} color="white" />
           </TouchableOpacity>
         </View>

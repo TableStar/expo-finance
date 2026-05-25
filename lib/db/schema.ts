@@ -3,12 +3,31 @@ import * as SQLite from 'expo-sqlite';
 export const db = SQLite.openDatabaseSync('finance.db');
 
 export async function initDb() {
+  db.execSync('PRAGMA journal_mode = WAL;');
+
+  const result = await db.getFirstAsync(
+    `SELECT name FROM sqlite_master WHERE type='table' AND name='accounts'`
+  );
+
+  if (!result) {
+    db.execSync('DROP TABLE IF EXISTS transactions');
+  }
+
   db.execSync(`
-    PRAGMA journal_mode = WAL;
+
+    CREATE TABLE IF NOT EXISTS accounts (
+      id          INTEGER PRIMARY KEY AUTOINCREMENT,
+      name        TEXT NOT NULL,
+      icon        TEXT NOT NULL DEFAULT 'wallet',
+      color       TEXT DEFAULT '#901E3E',
+      created_at  TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
+    );
 
     CREATE TABLE IF NOT EXISTS transactions (
-      -- Auto-incrementing primary key
       id          INTEGER PRIMARY KEY AUTOINCREMENT,
+
+      -- new account_id
+      account_id INTEGER NOT NULL,
 
       -- 'in' for cash in, 'out' for cash out
       type        TEXT NOT NULL CHECK(type IN ('in', 'out')),
@@ -32,15 +51,29 @@ export async function initDb() {
 
       -- Soft delete: NULL means not deleted, otherwise holds deletion timestamp
       -- This lets us show a 'Deleted Transactions' recovery screen later
-      deleted_at  TEXT
+      deleted_at  TEXT,
+      FOREIGN KEY (account_id) REFERENCES accounts(id)
     );
 
     -- Speed up the most common query: list transactions by date, excluding deleted
     CREATE INDEX IF NOT EXISTS idx_transactions_date
       ON transactions(date)
       WHERE deleted_at IS NULL;
+
+    CREATE INDEX IF NOT EXISTS idx_transactions_account
+      ON transactions(account_id)
+      WHERE deleted_at IS NULL;
+
+    CREATE TABLE IF NOT EXISTS settings (
+      key   TEXT PRIMARY KEY,
+      value TEXT
+    );
+      
   `);
 
+  const acctCount = await db.getFirstAsync<{ count: number }>(
+    'SELECT COUNT(*) as count FROM accounts '
+  );
   const count = await db.getFirstAsync<{ count: number }>(
     'SELECT COUNT(*) as count FROM transactions WHERE deleted_at IS NULL'
   );
@@ -48,7 +81,7 @@ export async function initDb() {
   if (count && count.count === 0) {
     // Dynamic import to avoid circular dependency:
     // schema.ts → transactions.ts already imports db from schema.ts
-    const { seedMockData } = await import('./transactions');
-    await seedMockData();
+    const { seedData } = await import('./transactions');
+    await seedData();
   }
 }

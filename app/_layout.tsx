@@ -3,7 +3,7 @@ import '@/global.css';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 
 import { ThemeProvider as NavThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
@@ -13,6 +13,8 @@ import { NAV_THEME } from '@/theme';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SQLiteProvider } from 'expo-sqlite';
 import { initDb } from '@/lib/db/schema';
+import { useEffect } from 'react';
+import { initStore, useTransactions } from '@/store/store';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -25,6 +27,18 @@ const queryClient = new QueryClient();
 
 export default function RootLayout() {
   const { colorScheme, isDarkColorScheme } = useColorScheme();
+
+  useEffect(() => {
+    initStore().then(() => {
+      const get = useTransactions.getState();
+      const accounts = get.accounts;
+      const activeAccountId = get.activeAccountId;
+      if (accounts.length === 0 || activeAccountId === null) {
+        // I'll replace '/' with the true path after creacte-account-modal has been made
+        router.replace('/create-account-modal?mode=first-time');
+      }
+    });
+  }, []);
 
   return (
     <>
@@ -43,6 +57,22 @@ export default function RootLayout() {
                   <Stack.Screen name="index" options={{ headerShown: false }} />
                   {/* <Stack.Screen name="index" options={INDEX_OPTIONS} /> */}
                   <Stack.Screen name="modal" options={MODAL_OPTIONS} />
+                  <Stack.Screen
+                    name="accounts-modal"
+                    options={{
+                      presentation: 'modal',
+                      animation: 'fade_from_bottom',
+                      title: 'Accounts',
+                    }}
+                  />
+                  <Stack.Screen
+                    name="create-account-modal"
+                    options={{
+                      presentation: 'modal',
+                      animation: 'fade_from_bottom',
+                      title: 'New Accounts',
+                    }}
+                  />
                 </Stack>
               </NavThemeProvider>
             </ActionSheetProvider>

@@ -25,6 +25,11 @@ export function formatDateLabel(dateStr: string) {
   });
 }
 
+export function formatYMD(d:Date){
+  const pad = (n: number) => n.toString().padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
 export function getDateRange(
   filter: FilterType,
   offset: number
@@ -34,9 +39,6 @@ export function getDateRange(
   label: string;
 } {
   const now = new Date();
-
-  const pad = (n: number) => n.toString().padStart(2, '0');
-  const formatYMD = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 
   const formatDisplay = (d: Date, opts: Intl.DateTimeFormatOptions) =>
     d.toLocaleDateString('id-ID', opts);

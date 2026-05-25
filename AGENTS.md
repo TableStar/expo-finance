@@ -8,6 +8,13 @@ This document provides guidelines for AI agents working on this codebase.
 - Experienced in React, especially React Router v7 framework mode.
 - New to mobile databases - using SQLite for local persistence.
 
+## Build Environment
+
+- **Dev APK**: Built with EAS Build (not local `npx expo run:android`).
+- **Hardware constraint**: 8GB RAM i3 laptop — local builds too slow (~20 min).
+- **EAS limit**: 15 builds/month for Android — avoid adding native modules that require rebuilds.
+- **Rule**: Prefer Expo SDK packages or SQLite-based solutions over native modules to minimize rebuild needs.
+
 ## Working Rules
 
 ### Code Execution
@@ -22,6 +29,12 @@ This document provides guidelines for AI agents working on this codebase.
 - The user will implement code themselves after plans are finalized.
 - Only switch to build mode when explicitly requested by the user.
 - Act as a **helper and backup executor** when the user is stuck or unmotivated, not as the primary implementer.
+
+### Detailed Plans
+
+- If a response requires a **detailed plan** (pseudocode, multi-step implementation, lengthy design docs), **ask the user to switch to BUILD or WRITE mode** so the plan can be written to a `.md` file in the codebase (e.g., `NEXT_PLAN.md`).
+- Do **not** dump long plans directly into chat — keep chat responses concise and redirect to the file.
+- The user is the executor and coder; plans live in files, not in conversation.
 
 ## Subagents
 
@@ -118,3 +131,31 @@ An expense/income tracker app with local-first data storage.
 - **class-variance-authority:** Component variant styling
 - **Expo Router:** File-based navigation
 - **React Native:** Core UI components
+
+## CodeGraph
+
+CodeGraph builds a semantic knowledge graph of codebases for faster, smarter code exploration.
+
+### If `.codegraph/` exists in the project
+
+**Answer directly with CodeGraph — don't delegate exploration to a file-reading sub-agent or a grep/read loop.** CodeGraph *is* the pre-built search index; re-deriving its answers with grep + Read repeats work it already did and costs more for the same result. For "how does X work?", architecture, trace, or where-is-X questions, answer in a handful of CodeGraph calls and stop — typically with **zero file reads**. The returned source is complete and authoritative: treat it as already read and do not re-open those files. Reach for raw Read/Grep only to confirm a specific detail CodeGraph didn't cover.
+
+**Tool selection by intent:**
+
+| Tool                                      | Use For                                                                                                 |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `codegraph_context`                       | Map a task / feature / area first — composes search + node + callers + callees in one call              |
+| `codegraph_trace`                         | "How does X reach Y" — the call path, each hop's body inline (follows dynamic-dispatch hops grep can't) |
+| `codegraph_explore`                       | Survey several related symbols' source in ONE budget-capped call                                        |
+| `codegraph_search`                        | Find a symbol by name                                                                                   |
+| `codegraph_callers` / `codegraph_callees` | Walk call flow one hop at a time                                                                        |
+| `codegraph_impact`                        | Check what's affected before editing                                                                    |
+| `codegraph_node`                          | Get a single symbol's source / signature                                                                |
+
+A direct CodeGraph answer is a handful of calls; a grep/read exploration is dozens.
+
+### If `.codegraph/` does NOT exist
+
+At the start of a session, ask the user if they'd like to initialize CodeGraph:
+
+"I notice this project doesn't have CodeGraph initialized. Would you like me to run `codegraph init -i` to build a code knowledge graph?"
