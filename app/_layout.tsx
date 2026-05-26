@@ -11,7 +11,6 @@ import { ThemeToggle } from '@/components/nativewindui/ThemeToggle';
 import { useColorScheme } from '@/lib/useColorScheme';
 import { NAV_THEME } from '@/theme';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { SQLiteProvider } from 'expo-sqlite';
 import { initDb } from '@/lib/db/schema';
 import { useEffect } from 'react';
 import { initStore, useTransactions } from '@/store/store';
@@ -29,7 +28,9 @@ export default function RootLayout() {
   const { colorScheme, isDarkColorScheme } = useColorScheme();
 
   useEffect(() => {
-    initStore().then(() => {
+    (async function init() {
+      await initDb();
+      await initStore();
       const get = useTransactions.getState();
       const accounts = get.accounts;
       const activeAccountId = get.activeAccountId;
@@ -37,7 +38,7 @@ export default function RootLayout() {
         // I'll replace '/' with the true path after creacte-account-modal has been made
         router.replace('/create-account-modal?mode=first-time');
       }
-    });
+    })();
   }, []);
 
   return (
@@ -48,37 +49,36 @@ export default function RootLayout() {
       />
       {/* WRAP YOUR APP WITH ANY ADDITIONAL PROVIDERS HERE */}
       {/* <ExampleProvider> */}
-      <SQLiteProvider databaseName="finance.db" onInit={initDb}>
-        <QueryClientProvider client={queryClient}>
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <ActionSheetProvider>
-              <NavThemeProvider value={NAV_THEME[colorScheme]}>
-                <Stack>
-                  <Stack.Screen name="index" options={{ headerShown: false }} />
-                  {/* <Stack.Screen name="index" options={INDEX_OPTIONS} /> */}
-                  <Stack.Screen name="modal" options={MODAL_OPTIONS} />
-                  <Stack.Screen
-                    name="accounts-modal"
-                    options={{
-                      presentation: 'modal',
-                      animation: 'fade_from_bottom',
-                      title: 'Accounts',
-                    }}
-                  />
-                  <Stack.Screen
-                    name="create-account-modal"
-                    options={{
-                      presentation: 'modal',
-                      animation: 'fade_from_bottom',
-                      title: 'New Accounts',
-                    }}
-                  />
-                </Stack>
-              </NavThemeProvider>
-            </ActionSheetProvider>
-          </GestureHandlerRootView>
-        </QueryClientProvider>
-      </SQLiteProvider>
+      <QueryClientProvider client={queryClient}>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <ActionSheetProvider>
+            <NavThemeProvider value={NAV_THEME[colorScheme]}>
+              <Stack>
+                <Stack.Screen name="index" options={{ headerShown: false }} />
+                {/* <Stack.Screen name="index" options={INDEX_OPTIONS} /> */}
+                <Stack.Screen name="modal" options={MODAL_OPTIONS} />
+                <Stack.Screen
+                  name="accounts-modal"
+                  options={{
+                    presentation: 'modal',
+                    animation: 'fade_from_bottom',
+                    title: 'Accounts',
+                  }}
+                />
+                <Stack.Screen
+                  name="create-account-modal"
+                  options={{
+                    presentation: 'modal',
+                    animation: 'fade_from_bottom',
+                    title: 'New Accounts',
+                  }}
+                />
+              </Stack>
+            </NavThemeProvider>
+          </ActionSheetProvider>
+        </GestureHandlerRootView>
+      </QueryClientProvider>
+
       {/* </ExampleProvider> */}
     </>
   );

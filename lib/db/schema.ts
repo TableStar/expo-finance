@@ -78,7 +78,7 @@ export async function initDb() {
     'SELECT COUNT(*) as count FROM transactions WHERE deleted_at IS NULL'
   );
 
-  if (count && count.count === 0) {
+  if (count && acctCount?.count === 0) {
     // Dynamic import to avoid circular dependency:
     // schema.ts → transactions.ts already imports db from schema.ts
     const { seedData } = await import('./transactions');

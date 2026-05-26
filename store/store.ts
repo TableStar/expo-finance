@@ -65,7 +65,7 @@ export const useTransactions = create<TransactionStore & { isLoading: boolean }>
         set({ activeAccountId: null });
       }
     }
-    set({ isLoading: false });
+    set({ accounts,isLoading: false });
   },
   addTransaction: async (transaction) => {
     set({ isLoading: true });
@@ -143,18 +143,18 @@ export const useTransactions = create<TransactionStore & { isLoading: boolean }>
 }));
 
 export async function initStore() {
-  const get = useTransactions.getState();
-  await get.loadAccounts();
+  
+  await useTransactions.getState().loadAccounts();
   const savedId = await getActiveAccountId();
-  const accounts = get.accounts;
+  const accounts = useTransactions.getState().accounts;
 
   if (accounts.length === 0) {
     return;
   }
 
   if (savedId !== null && accounts.find((a) => a.id === savedId)) {
-    await get.setActiveAccount(savedId);
+    await useTransactions.getState().setActiveAccount(savedId);
   } else {
-    await get.setActiveAccount(accounts[0].id);
+    await useTransactions.getState().setActiveAccount(accounts[0].id);
   }
 }
