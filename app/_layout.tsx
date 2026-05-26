@@ -53,26 +53,12 @@ export default function RootLayout() {
         <GestureHandlerRootView style={{ flex: 1 }}>
           <ActionSheetProvider>
             <NavThemeProvider value={NAV_THEME[colorScheme]}>
-              <Stack>
-                <Stack.Screen name="index" options={{ headerShown: false }} />
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="index" />
+                <Stack.Screen name="(modals)" options={{ presentation: 'modal', animation: 'fade_from_bottom' }} />
+                
                 {/* <Stack.Screen name="index" options={INDEX_OPTIONS} /> */}
-                <Stack.Screen name="modal" options={MODAL_OPTIONS} />
-                <Stack.Screen
-                  name="accounts-modal"
-                  options={{
-                    presentation: 'modal',
-                    animation: 'fade_from_bottom',
-                    title: 'Accounts',
-                  }}
-                />
-                <Stack.Screen
-                  name="create-account-modal"
-                  options={{
-                    presentation: 'modal',
-                    animation: 'fade_from_bottom',
-                    title: 'New Accounts',
-                  }}
-                />
+                {/* <Stack.Screen name="modal" options={MODAL_OPTIONS} /> */}
               </Stack>
             </NavThemeProvider>
           </ActionSheetProvider>

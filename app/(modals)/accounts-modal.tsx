@@ -1,3 +1,4 @@
+import ModalScreen from '@/components/ModalScreen';
 import { countTransactionByAcct } from '@/lib/db/transactions';
 import { useTransactions } from '@/store/store';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -45,7 +46,7 @@ export default function AccountsModal() {
   }
 
   return (
-    <View className="flex-1 bg-background">
+    <ModalScreen >
       <View className="flex-row items-center justify-between border-b border-border px-4 py-3">
         <Text className="text-lg font-bold text-foreground">Accounts</Text>
         <TouchableOpacity onPress={() => router.back()}>
@@ -93,6 +94,6 @@ export default function AccountsModal() {
         <Ionicons name="add-circle-outline" size={24} color="#901E3E" />
         <Text className="text-base font-semibold text-[#901E3E]">Add Account</Text>
       </TouchableOpacity>
-    </View>
+    </ModalScreen>
   );
 }
